@@ -1,4 +1,5 @@
 const UserModel = require('../models/userModel');
+const PasswordHelper=require('../utils/PasswordHelper')
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
@@ -24,8 +25,8 @@ class AuthController {
                 return res.redirect('/register');
             }
 
-            const salt = await bcryptjs.genSalt(10);
-            const hashedPassword = await bcryptjs.hash(password, salt);
+            // const salt = await bcryptjs.genSalt(10);
+            const hashedPassword = await PasswordHelper.hashPassword(password);
 
             const profileImage = req.file ? req.file.path : null;
 
@@ -74,7 +75,7 @@ class AuthController {
                 return res.redirect('/login');
             }
 
-            const isMatch = await bcryptjs.compare(password, user.password);
+            const isMatch = await PasswordHelper.comparePassword(password, user.password);
             if (!isMatch) {
                 req.flash('error_msg', 'Invalid email or password.');
                 return res.redirect('/login');

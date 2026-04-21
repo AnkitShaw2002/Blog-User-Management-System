@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('./layout/header.ejs') %>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%- include('./layout/flash.ejs') %>
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/blogs" class="nav-link">Blogs</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <span class="nav-link">
+          <i class="fas fa-user-circle mr-1"></i>
+          <strong><%= data.name %></strong>
+          <span class="badge badge-<%= data.role === 'admin' ? 'danger' : 'info' %> ml-1"><%= data.role.toUpperCase() %></span>
+        </span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="/api/auth/logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /Navbar -->
+
+  <%- include('./layout/sidebar.ejs') %>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Dashboard</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active">Home</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <!-- Stat cards -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3><%= totalBlogs %></h3>
+                <p>Total Blogs</p>
+              </div>
+              <div class="icon"><i class="fas fa-newspaper"></i></div>
+              <a href="/blogs" class="small-box-footer">View All <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+          <% if (data.role === 'admin') { %>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3><%= totalUsers %></h3>
+                <p>Total Users</p>
+              </div>
+              <div class="icon"><i class="fas fa-users"></i></div>
+              <a href="/users" class="small-box-footer">Manage Users <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <% } %>
+
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3><%= blogs.length %></h3>
+                <p><%= data.role === 'admin' ? 'Recent Blogs' : 'My Blogs' %></p>
+              </div>
+              <div class="icon"><i class="fas fa-blog"></i></div>
+              <a href="/blogs/create" class="small-box-footer">Create Blog <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3><%= data.role.toUpperCase() %></h3>
+                <p>Your Role</p>
+              </div>
+              <div class="icon"><i class="fas fa-user-tag"></i></div>
+              <a href="/dashboard" class="small-box-footer">My Account <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+        </div>
+        <!-- /Stat cards -->
+
+        <!-- Blog table -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card card-primary card-outline">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">
+                  <i class="fas fa-newspaper mr-2"></i>
+                  <%= data.role === 'admin' ? 'Recent Blogs (Admin View)' : 'My Blogs' %>
+                </h3>
+                <a href="/blogs/create" class="btn btn-sm btn-success">
+                  <i class="fas fa-plus mr-1"></i> New Blog
+                </a>
+              </div>
+              <div class="card-body p-0">
+                <% if (blogs.length === 0) { %>
+                  <div class="text-center py-5 text-muted">
+                    <i class="fas fa-newspaper fa-3x mb-3"></i>
+                    <p>No blogs yet. <a href="/blogs/create">Create your first blog!</a></p>
+                  </div>
+                <% } else { %>
+                <div class="table-responsive">
+                  <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <% if (data.role === 'admin') { %><th>Author</th><% } %>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% blogs.forEach(blog => { %>
+                        <tr>
+                          <td>
+                            <% if (blog.blogImage) { %>
+                              <img src="/<%= blog.blogImage %>" class="blog-img-thumb" alt="Blog">
+                            <% } else { %>
+                              <div class="blog-img-thumb bg-secondary d-flex align-items-center justify-content-center rounded">
+                                <i class="fas fa-image text-white"></i>
+                              </div>
+                            <% } %>
+                          </td>
+                          <td><strong><%= blog.title %></strong></td>
+                          <td><span class="badge badge-info"><%= blog.category %></span></td>
+                          <% if (data.role === 'admin') { %>
+                            <td><%= blog.authorName %></td>
+                          <% } %>
+                          <td>
+                            <% if (blog.isDeleted) { %>
+                              <span class="badge badge-secondary">Deleted</span>
+                            <% } else { %>
+                              <span class="badge badge-success">Active</span>
+                            <% } %>
+                          </td>
+                          <td><%= new Date(blog.createdAt).toLocaleDateString() %></td>
+                          <td>
+                            <a href="/blogs/<%= blog._id %>" class="btn btn-xs btn-info mr-1" title="View">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                            <% if (!blog.isDeleted && (data.role === 'admin' || blog.author.toString() === data.id)) { %>
+                              <a href="/blogs/edit/<%= blog._id %>" class="btn btn-xs btn-warning mr-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                              </a>
+                              <form action="/api/blogs/delete/<%= blog._id %>" method="POST" class="d-inline"
+                                    onsubmit="return confirm('Delete this blog?')">
+                                <button type="submit" class="btn btn-xs btn-danger" title="Delete">
+                                  <i class="fas fa-trash"></i>
+                                </button>
+                              </form>
+                            <% } %>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <%- include('./layout/footer.ejs') %>
+</div>
+</body>
+</html>

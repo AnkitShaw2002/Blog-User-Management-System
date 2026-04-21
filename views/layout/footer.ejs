@@ -1,0 +1,20 @@
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2026 BlogMS.</strong> All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 1.0.0
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script>
+    // Auto-dismiss flash messages after 4 seconds
+    setTimeout(() => {
+      document.querySelectorAll('.flash-alert').forEach(el => {
+        el.style.transition = 'opacity 0.5s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 4000);
+  </script>

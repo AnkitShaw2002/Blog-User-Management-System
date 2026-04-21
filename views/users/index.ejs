@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../layout/header.ejs') %>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%- include('../layout/flash.ejs') %>
+
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <span class="nav-link">
+          <i class="fas fa-user-shield mr-1 text-danger"></i>
+          <strong><%= data.name %></strong> <span class="badge badge-danger">ADMIN</span>
+        </span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="/api/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  <%- include('../layout/sidebar.ejs') %>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"><i class="fas fa-users-cog mr-2"></i>User Management</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+              <li class="breadcrumb-item active">Users</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <!-- Summary cards -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Users</span>
+                <span class="info-box-number"><%= users.length %></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-box">
+              <span class="info-box-icon bg-danger"><i class="fas fa-user-shield"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Admins</span>
+                <span class="info-box-number"><%= users.filter(u => u.role === 'admin').length %></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="fas fa-user"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Regular Users</span>
+                <span class="info-box-number"><%= users.filter(u => u.role === 'user').length %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card card-danger card-outline">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-table mr-2"></i>All Registered Users</h3>
+          </div>
+          <div class="card-body p-0">
+            <% if (users.length === 0) { %>
+              <div class="text-center py-5 text-muted">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <p>No users found.</p>
+              </div>
+            <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>#</th>
+                    <th>Profile</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% users.forEach((user, i) => { %>
+                    <tr>
+                      <td><%= i + 1 %></td>
+                      <td>
+                        <% if (user.profileImage) { %>
+                          <img src="/<%= user.profileImage %>" class="profile-img-sm" alt="<%= user.name %>">
+                        <% } else { %>
+                          <div class="profile-img-sm bg-<%= user.role === 'admin' ? 'danger' : 'primary' %> d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user text-white" style="font-size:13px"></i>
+                          </div>
+                        <% } %>
+                      </td>
+                      <td>
+                        <strong><%= user.name %></strong>
+                        <% if (user._id.toString() === data.id) { %>
+                          <span class="badge badge-secondary ml-1">You</span>
+                        <% } %>
+                      </td>
+                      <td><%= user.email %></td>
+                      <td>
+                        <% if (user.role === 'admin') { %>
+                          <span class="badge badge-role-admin"><i class="fas fa-shield-alt mr-1"></i>Admin</span>
+                        <% } else { %>
+                          <span class="badge badge-role-user"><i class="fas fa-user mr-1"></i>User</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (user.isActive) { %>
+                          <span class="badge badge-success"><i class="fas fa-circle mr-1"></i>Active</span>
+                        <% } else { %>
+                          <span class="badge badge-secondary">Inactive</span>
+                        <% } %>
+                      </td>
+                      <td><%= new Date(user.createdAt).toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) %></td>
+                      <td>
+                        <% if (user._id.toString() !== data.id) { %>
+                          <form action="/api/users/delete/<%= user._id %>" method="POST" class="d-inline"
+                                onsubmit="return confirm('Are you sure you want to permanently delete user \"<%= user.name %>\"?')">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                              <i class="fas fa-trash mr-1"></i>Delete
+                            </button>
+                          </form>
+                        <% } else { %>
+                          <span class="text-muted"><small>Cannot delete self</small></span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+            <% } %>
+          </div>
+          <div class="card-footer text-muted">
+            <small><i class="fas fa-info-circle mr-1"></i>Deleting a user permanently removes their account and profile image.</small>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <%- include('../layout/footer.ejs') %>
+</div>
+</body>
+</html>

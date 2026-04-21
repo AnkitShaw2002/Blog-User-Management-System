@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../layout/header.ejs') %>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%- include('../layout/flash.ejs') %>
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <% if (data) { %>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      <% } %>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/blogs" class="nav-link"><i class="fas fa-blog mr-1"></i>BlogMS</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <% if (data) { %>
+        <li class="nav-item">
+          <a href="/dashboard" class="nav-link"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a href="/blogs/create" class="nav-link btn btn-sm btn-success text-white ml-2">
+            <i class="fas fa-plus mr-1"></i>New Blog
+          </a>
+        </li>
+        <li class="nav-item ml-2">
+          <a class="nav-link text-danger" href="/api/auth/logout"><i class="fas fa-sign-out-alt"></i></a>
+        </li>
+      <% } else { %>
+        <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
+        <li class="nav-item"><a href="/register" class="nav-link btn btn-sm btn-primary text-white ml-2">Register</a></li>
+      <% } %>
+    </ul>
+  </nav>
+  <!-- /Navbar -->
+
+  <% if (data) { %>
+    <%- include('../layout/sidebar.ejs') %>
+  <% } %>
+
+  <div class="<%= data ? 'content-wrapper' : '' %>" style="<%= !data ? 'margin-left:0;padding-top:60px;background:#f4f6f9;min-height:100vh;' : '' %>">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"><i class="fas fa-newspaper mr-2"></i>All Blogs</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/blogs">Home</a></li>
+              <li class="breadcrumb-item active">Blogs</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <% if (blogs.length === 0) { %>
+          <div class="text-center py-5">
+            <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No blogs published yet.</h4>
+            <% if (data) { %>
+              <a href="/blogs/create" class="btn btn-primary mt-2"><i class="fas fa-plus mr-1"></i>Create First Blog</a>
+            <% } else { %>
+              <a href="/register" class="btn btn-primary mt-2">Join to Write</a>
+            <% } %>
+          </div>
+        <% } else { %>
+          <div class="row">
+            <% blogs.forEach(blog => { %>
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card card-blog h-100">
+                  <% if (blog.blogImage) { %>
+                    <img src="/<%= blog.blogImage %>" class="blog-card-img" alt="<%= blog.title %>">
+                  <% } else { %>
+                    <div class="blog-card-img bg-gradient-secondary d-flex align-items-center justify-content-center">
+                      <i class="fas fa-newspaper fa-3x text-white opacity-50"></i>
+                    </div>
+                  <% } %>
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="badge badge-info"><%= blog.category %></span>
+                      <small class="text-muted"><%= new Date(blog.createdAt).toLocaleDateString() %></small>
+                    </div>
+                    <h5 class="card-title"><%= blog.title %></h5>
+                    <p class="card-text text-muted flex-grow-1">
+                      <%= blog.content.substring(0, 120) %><% if (blog.content.length > 120) { %>...<% } %>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                      <div class="d-flex align-items-center">
+                        <% if (blog.author && blog.author.profileImage) { %>
+                          <img src="/<%= blog.author.profileImage %>" class="profile-img-sm mr-2" alt="">
+                        <% } else { %>
+                          <div class="profile-img-sm bg-primary mr-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user text-white" style="font-size:12px"></i>
+                          </div>
+                        <% } %>
+                        <small class="text-muted"><%= blog.authorName %></small>
+                      </div>
+                      <a href="/blogs/<%= blog._id %>" class="btn btn-sm btn-outline-primary">Read More</a>
+                    </div>
+                  </div>
+                  <% if (data && (data.role === 'admin' || (blog.author && blog.author._id && blog.author._id.toString() === data.id))) { %>
+                    <div class="card-footer bg-transparent d-flex justify-content-end gap-1">
+                      <a href="/blogs/edit/<%= blog._id %>" class="btn btn-xs btn-warning mr-1">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <form action="/api/blogs/delete/<%= blog._id %>" method="POST" class="d-inline"
+                            onsubmit="return confirm('Delete this blog?')">
+                        <button type="submit" class="btn btn-xs btn-danger">
+                          <i class="fas fa-trash"></i> Delete
+                        </button>
+                      </form>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </div>
+
+  <%- include('../layout/footer.ejs') %>
+</div>
+</body>
+</html>

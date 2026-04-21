@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../layout/header.ejs') %>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%- include('../layout/flash.ejs') %>
+
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <% if (data) { %>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      <% } %>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/blogs" class="nav-link"><i class="fas fa-blog mr-1"></i>BlogMS</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <% if (data) { %>
+        <li class="nav-item"><a href="/dashboard" class="nav-link">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="/api/auth/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+      <% } else { %>
+        <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
+        <li class="nav-item"><a href="/register" class="nav-link btn btn-sm btn-primary text-white ml-2">Register</a></li>
+      <% } %>
+    </ul>
+  </nav>
+
+  <% if (data) { %>
+    <%- include('../layout/sidebar.ejs') %>
+  <% } %>
+
+  <div class="<%= data ? 'content-wrapper' : '' %>" style="<%= !data ? 'margin-left:0;padding-top:60px;background:#f4f6f9;min-height:100vh;' : '' %>">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Blog Post</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/blogs">Blogs</a></li>
+              <li class="breadcrumb-item active">Detail</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+              <% if (blog.blogImage) { %>
+                <img src="/<%= blog.blogImage %>" class="card-img-top"
+                     alt="<%= blog.title %>" style="max-height:400px;object-fit:cover;">
+              <% } %>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <span class="badge badge-info badge-lg"><%= blog.category %></span>
+                  <small class="text-muted"><i class="fas fa-calendar mr-1"></i><%= new Date(blog.createdAt).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}) %></small>
+                </div>
+
+                <h2 class="card-title"><%= blog.title %></h2>
+
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                  <% if (blog.author && blog.author.profileImage) { %>
+                    <img src="/<%= blog.author.profileImage %>" class="profile-img-sm mr-2" alt="">
+                  <% } else { %>
+                    <div class="profile-img-sm bg-primary mr-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-user text-white" style="font-size:13px"></i>
+                    </div>
+                  <% } %>
+                  <div>
+                    <strong><%= blog.authorName %></strong>
+                    <% if (blog.author && blog.author.email) { %>
+                      <br><small class="text-muted"><%= blog.author.email %></small>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="blog-content" style="line-height:1.8;font-size:16px;white-space:pre-wrap;">
+                  <%= blog.content %>
+                </div>
+
+                <% if (data && (data.role === 'admin' || (blog.author && blog.author._id && blog.author._id.toString() === data.id))) { %>
+                  <div class="mt-4 pt-3 border-top d-flex justify-content-between">
+                    <a href="/blogs/edit/<%= blog._id %>" class="btn btn-warning">
+                      <i class="fas fa-edit mr-1"></i>Edit Blog
+                    </a>
+                    <form action="/api/blogs/delete/<%= blog._id %>" method="POST"
+                          onsubmit="return confirm('Are you sure you want to delete this blog?')">
+                      <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash mr-1"></i>
+                        <%= data.role === 'admin' ? 'Hard Delete' : 'Delete Blog' %>
+                      </button>
+                    </form>
+                  </div>
+                <% } %>
+
+              </div>
+              <div class="card-footer text-muted">
+                <a href="/blogs" class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-arrow-left mr-1"></i>Back to Blogs
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <%- include('../layout/footer.ejs') %>
+</div>
+</body>
+</html>

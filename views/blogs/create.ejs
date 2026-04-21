@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../layout/header.ejs') %>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%- include('../layout/flash.ejs') %>
+
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/blogs" class="nav-link">All Blogs</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="/api/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  <%- include('../layout/sidebar.ejs') %>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"><i class="fas fa-plus-circle mr-2"></i>Create New Blog</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="/blogs">Blogs</a></li>
+              <li class="breadcrumb-item active">Create</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-8 offset-lg-2">
+            <div class="card card-primary card-outline">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-pen mr-2"></i>Write Your Blog</h3>
+              </div>
+              <div class="card-body">
+                <form action="/api/blogs" method="POST" enctype="multipart/form-data">
+
+                  <div class="form-group">
+                    <label for="title"><i class="fas fa-heading mr-1"></i> Blog Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter an engaging title..." required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category"><i class="fas fa-tag mr-1"></i> Category</label>
+                    <select class="form-control custom-select" id="category" name="category">
+                      <option value="Tech">Tech</option>
+                      <option value="Lifestyle">Lifestyle</option>
+                      <option value="Education">Education</option>
+                      <option value="Travel">Travel</option>
+                      <option value="Food">Food</option>
+                      <option value="Other" selected>Other</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="content"><i class="fas fa-align-left mr-1"></i> Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="content" name="content" rows="10"
+                              placeholder="Start writing your blog post here..." required></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label><i class="fas fa-image mr-1"></i> Blog Image <small class="text-muted">(optional, max 10MB)</small></label>
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" name="blogImage" id="blogImage" accept="image/*">
+                      <label class="custom-file-label" for="blogImage">Choose image...</label>
+                    </div>
+                    <div class="mt-2">
+                      <img id="blogImgPreview" src="" alt="" style="max-width:100%;max-height:250px;object-fit:cover;border-radius:6px;display:none;">
+                    </div>
+                  </div>
+
+                  <div class="card-footer d-flex justify-content-between px-0">
+                    <a href="/blogs" class="btn btn-secondary"><i class="fas fa-arrow-left mr-1"></i>Cancel</a>
+                    <button type="submit" class="btn btn-success">
+                      <i class="fas fa-paper-plane mr-1"></i>Publish Blog
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <%- include('../layout/footer.ejs') %>
+</div>
+<script>
+  document.getElementById('blogImage').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    document.querySelector('.custom-file-label').textContent = file ? file.name : 'Choose image...';
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.getElementById('blogImgPreview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+</body>
+</html>
